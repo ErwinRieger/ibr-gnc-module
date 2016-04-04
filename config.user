@@ -1,0 +1,103 @@
+;
+; This file is released under the terms of the GNU General Public License
+; as they appear in http://www.gnu.org/licenses/gpl.txt.
+;
+; Copyright 2007-2015 erwin.rieger@ibrieger.de
+;
+
+; Enable stack backtraces
+; (debug-enable 'debug)
+; (turn-on-debugging)
+
+; (debug-enable 'trace)
+; (debug-enable 'backtrace)
+
+(printf "Start config.user\n")
+
+(define ibr-menu-created #f)
+(define ibr-debug #t)
+
+; (printf "Debug options: %s\n" (debug-options 'full))
+
+;
+; Betriebssystem-unterscheidung.
+; Falls environment variable "USERPROFILE" gesetzt ist, dann gehen wir davon aus,
+; dass wir unter windows laufen.
+;
+(define (running-on-windows)
+    (getenv "USERPROFILE")
+)
+
+;
+; Seit GnuCash 2.6 fehlt die "build-path" funktion, desshalb hier selbst definieren:
+;
+(define (build-path . elements)
+    (if (running-on-windows)
+        (string-join elements "\\")
+        (string-join elements "/")
+    )
+)
+
+(define (load-ibr-module run-on-windows)
+    (let (
+            (tmpdir (or (or (getenv "TMP") (getenv "TEMP")) (getenv "USERPROFILE")))
+            (path (build-path (or (getenv "HOME") (getenv "USERPROFILE")) ".gnucash" "ibr-gnc-module.scm"))
+        )
+
+        ; 
+        ; Unter windows eine eigene logdatei oeffnen und ausgaben
+        ; (printf, backtrace) umleiten:
+        ; 
+        (if run-on-windows
+            (begin
+                (gnc:warn "IBR: logging to: " (build-path tmpdir "ibr-gnc-module.log"))
+                (set-current-output-port (open-output-file (build-path tmpdir "ibr-gnc-module.log")))
+                (set-current-error-port (current-output-port))
+            )
+        )
+
+        (printf "Config.user: loading %s ...\n" path)
+        (load path)
+        (printf "Config.user: running ibr-init ...\n")
+        (ibr-init)
+    )
+)
+
+(printf "Definition of 'load-ibr-module' done ...\n")
+
+(let (
+        ; (userprofile (getenv "USERPROFILE"))
+    )
+
+    ; 
+    ; XXX wir benutzen "lazy-catch" hier anstatt "catch", da die windows version
+    ; von guile/gnucash den vierten parameter der catch expression (den pre-unwind-handler)
+    ; nicht unterstuetzt. Die alternative "with-throw-handler" wird ebenfalls nicht
+    ; unterstuetzt.
+    ;
+    (lazy-catch #t
+
+        (lambda ()
+            (load-ibr-module (running-on-windows))
+        )
+
+        (lambda (key . parameters)
+            (printf "Config.user: Catch-Handler called, exception raised:\n")
+
+            (printf "Error '")
+            (display key)
+
+            (printf "' while running load-ibr-module\nParameters: ")
+            (display parameters)
+            (printf "\n")
+
+            (printf "Config.user: backtrace:\n")
+            (display-backtrace (make-stack #t) (current-error-port))
+            (printf "Config.user: backtrace done.\n")
+        )
+    )
+)
+
+(printf "End config.user\n")
+
+
