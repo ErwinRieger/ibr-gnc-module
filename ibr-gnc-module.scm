@@ -333,7 +333,7 @@
     ; (string=? (substring knr 0 3) "380")
 ; )
 ;
-; Konto ueber kontonummoer oder kontobeschreibung (datev nummer) suchen
+; Konto ueber kontonummer oder kontobeschreibung (datev nummer) suchen
 ; xxx find-acc-in-childs-by-code durch find-acc-in-acclist-by-code ersetzen
 (define (find-acc-in-acclist-by-code accountlist accountcode)
 
@@ -2727,7 +2727,7 @@
 
                                 (if restwert
 
-                                    ; Nur auflisten, falls restwert vorhanden (oder kauf in diesem yahr)
+                                    ; Nur auflisten, falls restwert vorhanden (oder kauf in diesem jahr)
                                     (if (not (gnc-numeric-zero-p restwert))
                                         (begin
 
