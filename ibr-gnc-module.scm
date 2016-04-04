@@ -333,7 +333,7 @@
     ; (string=? (substring knr 0 3) "380")
 ; )
 ;
-; Konto ueber kontonummoer oder kontobeschreibung (datev nummer) suchen
+; Konto ueber kontonummer oder kontobeschreibung (datev nummer) suchen
 ; xxx find-acc-in-childs-by-code durch find-acc-in-acclist-by-code ersetzen
 (define (find-acc-in-acclist-by-code accountlist accountcode)
 
@@ -420,9 +420,9 @@
             (if (= (length (xaccAccountGetSplitList account)) 0)
                 knr
                 (begin
-                    ; Account hat keine knr oder knr hat nicht 4 oder 5 stellen, fehler falls das konto
+                    ; Account hat keine knr oder knr hat nicht 4, 5 oder 6 stellen. fehler falls das konto
                     ; buchungen enthaelt
-                    (html-add-text doc "<br>" (redText "ERROR") ", Konto: '" (xaccAccountGetName account) "' hat eine ungueltige Kontonummer!<br><br>")
+                    (html-add-text doc "<br>" (redText "ERROR") ", Konto: '" (xaccAccountGetName account) "' hat eine ungueltige Kontonummer (braucht 4, 5 oder 6 stellen, aber ist '" knr "')!<br><br>")
                     "0000"
                 )
             )
@@ -2727,7 +2727,7 @@
 
                                 (if restwert
 
-                                    ; Nur auflisten, falls restwert vorhanden (oder kauf in diesem yahr)
+                                    ; Nur auflisten, falls restwert vorhanden (oder kauf in diesem jahr)
                                     (if (not (gnc-numeric-zero-p restwert))
                                         (begin
 
