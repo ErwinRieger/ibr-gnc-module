@@ -2,7 +2,7 @@
 ; This file is released under the terms of the GNU General Public License
 ; as they appear in http://www.gnu.org/licenses/gpl.txt.
 ;
-; Copyright 2007-2015 erwin.rieger@ibrieger.de
+; Copyright 2007-2016 erwin.rieger@ibrieger.de
 ;
 
 ;
