@@ -422,7 +422,7 @@
                 (begin
                     ; Account hat keine knr oder knr hat nicht 4, 5 oder 6 stellen. fehler falls das konto
                     ; buchungen enthaelt
-                    (html-add-text doc "<br>" (redText "ERROR") ", Konto: '" (xaccAccountGetName account) "' hat eine ungueltige Kontonummer!<br><br>")
+                    (html-add-text doc "<br>" (redText "ERROR") ", Konto: '" (xaccAccountGetName account) "' hat eine ungueltige Kontonummer (braucht 4, 5 oder 6 stellen, aber ist '" knr "')!<br><br>")
                     "0000"
                 )
             )
