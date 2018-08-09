@@ -2,7 +2,7 @@
 GnuCash Erweiterungen für deutsche Buchhaltung.
 
 Bitte beachten:
-===============
+---------------
 
 Dieses modul wird nicht weiter von mir gepflegt, letzte getestete Gnucash version war 2.4.x.
 
