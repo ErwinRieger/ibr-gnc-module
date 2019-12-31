@@ -4,7 +4,7 @@
 set GNUCASH="%userprofile%\.gnucash"
 
 @echo.
-@echo Installiere config.user und ibr-gnc-module.scm nach %GNUCASH% ...
+@echo Installiere config-user.scm und ibr-gnc-module.scm nach %GNUCASH% ...
 @echo.
 
 IF EXIST %GNUCASH% GOTO DIROK
@@ -13,7 +13,7 @@ mkdir %GNUCASH%
 
 :DIROK
 
-copy config.user %GNUCASH%
+copy config-user.scm %GNUCASH%
 copy ibr-gnc-module.scm %GNUCASH%
 
 @echo.

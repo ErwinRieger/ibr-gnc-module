@@ -12,12 +12,12 @@
 ; (debug-enable 'trace)
 ; (debug-enable 'backtrace)
 
-(printf "Start config.user\n")
+(display "Start config-user.scm\n")
 
 (define ibr-menu-created #f)
 (define ibr-debug #t)
 
-; (printf "Debug options: %s\n" (debug-options 'full))
+; (display "Debug options: %s\n" (debug-options 'full))
 
 ;
 ; Betriebssystem-unterscheidung.
@@ -56,48 +56,40 @@
             )
         )
 
-        (printf "Config.user: loading %s ...\n" path)
+        (display (format #f "config-user.scm: loading %s ...\n" path))
         (load path)
-        (printf "Config.user: running ibr-init ...\n")
+        (display "config-user.scm: running ibr-init ...\n")
         (ibr-init)
     )
 )
 
-(printf "Definition of 'load-ibr-module' done ...\n")
+(display "Definition of 'load-ibr-module' done ...\n")
 
 (let (
         ; (userprofile (getenv "USERPROFILE"))
     )
 
-    ; 
-    ; XXX wir benutzen "lazy-catch" hier anstatt "catch", da die windows version
-    ; von guile/gnucash den vierten parameter der catch expression (den pre-unwind-handler)
-    ; nicht unterstuetzt. Die alternative "with-throw-handler" wird ebenfalls nicht
-    ; unterstuetzt.
-    ;
-    (lazy-catch #t
+    (with-throw-handler #t
 
         (lambda ()
             (load-ibr-module (running-on-windows))
         )
 
         (lambda (key . parameters)
-            (printf "Config.user: Catch-Handler called, exception raised:\n")
+            (display "config-user.scm: Catch-Handler called, exception raised:\n")
 
-            (printf "Error '")
+            (display "Error '")
             (display key)
 
-            (printf "' while running load-ibr-module\nParameters: ")
+            (display "' while running load-ibr-module\nParameters: ")
             (display parameters)
-            (printf "\n")
+            (display "\n")
 
-            (printf "Config.user: backtrace:\n")
+            (display "config-user.scm: backtrace:\n")
             (display-backtrace (make-stack #t) (current-error-port))
-            (printf "Config.user: backtrace done.\n")
+            (display "config-user.scm: backtrace done.\n")
         )
     )
 )
 
-(printf "End config.user\n")
-
-
+(display "End config-user.scm\n")

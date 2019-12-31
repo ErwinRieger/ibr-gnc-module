@@ -75,7 +75,7 @@ Unter Windows:
 -  
 
    Das installationsscript "Install.bat" ausführen. Dadurch werden die
-   dateien ibr-gnc-module.scm und config.user nach 
+   dateien ibr-gnc-module.scm und config-user.scm nach 
    %userprofile%\\.gnucash kopiert).
 -  
 
@@ -101,7 +101,7 @@ Unter Linux/Unix:
    Die datei ibr-gnc-module.scm nach $HOME/.gnucash kopieren.
 -  
 
-   Die datei config.user nach $HOME/.gnucash kopieren (oder deren inhalt
+   Die Datei config-user.scm nach $HOME/.gnucash kopieren (oder deren Inhalt
    entsprechend anpassen falls dort schon eigene modifikationen
    enthalten sind).
 -  
