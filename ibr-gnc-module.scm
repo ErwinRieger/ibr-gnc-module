@@ -197,9 +197,9 @@
 ;     die rede ist. Um dies klar zu machen benutzen wir hier die endung " TPTS ".
 ;
 ; Wie kann der TPTS wert modifiziert werden?:
-;   * gnc:timepair-get-year       -> int
-;   * gnc:timepair-start-day-time -> TPTS 
-;   * gnc:timepair-end-day-time   -> TPTS 
+;   * gnc:time64-get-year       -> int
+;   * gnc:time64-start-day-time -> TPTS
+;   * gnc:time64-end-day-time   -> TPTS
 ;
 ;
 ; Dann gibt es noch einen datentype "gnc-date" der die scheme-repraesentation eines
@@ -210,9 +210,9 @@
 ;
 ; Umwandlung der datentypen:
 ;
-;   * TPTS -> TMDATE: gnc:timepair->date
+;   * TPTS -> TMDATE: gnc-localtime
 ;
-;   * TMDATE -> TPTS: gnc:date->timepair
+;   * TMDATE -> TPTS: gnc-mktime
 ;
 ; Weitere datums-datentypen: GDate
 ;
@@ -235,7 +235,7 @@
 ;
 ;
 
-(printf "Start ibr-gnc-module.scm\n")
+(display "Start ibr-gnc-module.scm\n")
 
 (gnc:module-load "gnucash/business-utils" 0)
 
@@ -345,7 +345,7 @@
             (account (car accountlist))
         )
 
-        ; (printf "find-acc-in-acclist-by-code search: %s, code: %s, desc: %s\n" accountcode (xaccAccountGetCode account) (xaccAccountGetDescription account))
+        ; (display (format #f "find-acc-in-acclist-by-code search: ~a, code: ~a, desc: ~a\n" accountcode (xaccAccountGetCode account) (xaccAccountGetDescription account)))
 
         (if (or (string=? accountcode (xaccAccountGetCode account)) (string=? accountcode (xaccAccountGetDescription account)))
             account
@@ -447,8 +447,8 @@
 
 ; ausgabe transaktion mit link
 (define (html-add-trn doc trn)
-    (printf "transaction num in html-add-trn: '%s'\n" (xaccTransGetNum trn))
-    (gnc:html-document-add-object! doc (gnc:html-transaction-anchor trn (gnc-print-date (gnc-transaction-get-date-posted trn))))
+    (display (format #f "transaction num in html-add-trn: '~a'\n" (xaccTransGetNum trn)))
+    (gnc:html-document-add-object! doc (gnc:html-transaction-anchor trn (qof-print-date (xaccTransGetDate trn))))
     (gnc:html-document-add-object! doc "; ")
     (gnc:html-document-add-object! doc (xaccTransGetDescription trn))
 )
@@ -503,7 +503,7 @@
             (anlagenaccounts (find-accounts-has-desc-value-no-descendants doc "AFAK"))
             (result #t)
         )
-        ; (display anlagenaccounts) (printf "<afa-anlaccounts\n")
+        ; (display anlagenaccounts) (display "<afa-anlaccounts\n")
 
         (if (equal? anlagenaccounts '())
             (begin
@@ -549,7 +549,7 @@
             ; (restlist (cdr accountlist))
         ; )
 
-        ; (printf "find account, %s code %s\n" code (xaccAccountGetCode account))
+        ; (display (format #f "find account, ~a code ~a\n" code (xaccAccountGetCode account)))
 
         ; (if (string=? code (xaccAccountGetCode account))
             ; account
@@ -557,7 +557,7 @@
                     ; (acc (find-acc-in-group-by-code (gnc-account-get-children account) code))
                     ; (acc (find-acc-in-group-by-code account code))
                 ; )
-                ; (printf "after find-acc-in-group-by-code\n")
+                ; (display "after find-acc-in-group-by-code\n")
                 ; (if (and (not acc) (not (null? restlist)))
                     ; (find-acc-in-childs-by-code restlist code)
                     ; acc
@@ -639,7 +639,7 @@
             (path (gnc-book-path name))
         )
 
-        (printf "path to open: %s, current open: %s\n" path (qof-session-get-url cursession))
+        (display (format #f "path to open: ~a, current open: ~a\n" path (qof-session-get-url cursession)))
         (if (string=? path (qof-session-get-url cursession))
             cursession ; return current session
             (openSession path) ; open new session
@@ -672,7 +672,7 @@
         )
         (qof-query-set-book query book)
         (xaccQueryAddSingleAccountMatch query account QOF-QUERY-AND)
-        (xaccQueryAddNumberMatch query num 0 1 QOF-QUERY-AND)
+        (xaccQueryAddNumberMatch query num 0 1 QOF-STRING-MATCH-NORMAL QOF-QUERY-AND)
 
         (set! splits (xaccQueryGetSplitsUniqueTrans query))
         (qof-query-destroy query)
@@ -719,15 +719,15 @@
             (splitted (string-split knr #\_))
         )
 
-        (printf "splitted:")
+        (display "splitted:")
         (display splitted)
-        (printf "\n")
+        (display "\n")
 
         (if (> (length splitted) 1)
             (let (
                     (satz (list-ref (string-split (list-ref splitted 1) #\%) 0))
                 )
-                ; (printf "get-ust-satz-from-acc-desc: steuersatz fuer konto %s: %s\n" knr satz)
+                ; (display (format #f "get-ust-satz-from-acc-desc: steuersatz fuer konto ~a: ~a\n" knr satz))
                 (string->number satz)
             )
             0
@@ -745,15 +745,15 @@
             (begin
 
                 ; (display account)
-                ; (printf "<<get-desc-value account\n")
-                ; (printf "<<get-desc-value account-desc: %s/%s\n" (xaccAccountGetName account) (xaccAccountGetDescription account))
+                ; (display "<<get-desc-value account\n")
+                ; (display (format #f "<<get-desc-value account-desc: ~a/~a\n" (xaccAccountGetName account) (xaccAccountGetDescription account)))
 
                 (map (lambda (token)
                         (let (
                                 (splitted (string-split token #\=))
                             )
                 
-                            ; (printf "<<get-desc-value token:%s\n" token)
+                            ; (display (format #f "<<get-desc-value token:~a\n" token))
                             (if (string-ci=? (list-ref splitted 0) key)
                                 ; Eintraege ohne wert (boolean) beachten
                                 (if (> (length splitted) 1)
@@ -774,7 +774,7 @@
                 )
 
                 ; (if result
-                    ; (printf "get-desc-value %s:'%s'\n" key result)
+                    ; (display (format #f "get-desc-value ~a:'~a'\n" key result))
                 ; )
             )
         )
@@ -793,8 +793,8 @@
         )
 
         ; (display account)
-        ; (printf "<<get-desc-value account\n")
-        ; (printf "<<get-desc-value account-desc: %s/%s\n" (xaccAccountGetName account) (xaccAccountGetDescription account))
+        ; (display "<<get-desc-value account\n")
+        ; (display (format #f "<<get-desc-value account-desc: ~a/~a\n" (xaccAccountGetName account) (xaccAccountGetDescription account)))
 
         (map 
             (lambda (token)
@@ -803,7 +803,7 @@
                         (splitted (string-split token #\=))
                     )
         
-                    ; (printf "<<get-desc-value token:%s\n" token)
+                    ; (display (format #f "<<get-desc-value token:~a\n" token))
                     (if (string-ci=? (list-ref splitted 0) key)
                         ; Eintraege ohne wert (boolean) beachten
                         (if (> (length splitted) 1)
@@ -895,7 +895,7 @@
             (stringval (get-gegenkonto-desc-value doc kkey key account))
         )
 
-        ; (printf "stringval: %s" stringval)
+        ; (display (format #f "stringval: ~a" stringval))
 
         (if stringval
             (string->number stringval)
@@ -915,9 +915,9 @@
             (ust (get-desc-value "Mwst" doc account #t))
         )
 
-        (printf "ust<")
+        (display "ust<")
         (display ust)
-        (printf ">\n")
+        (display ">\n")
 
         (if ust
             (string->number ust)
@@ -1011,7 +1011,7 @@
                             (ustnumeric #f)
                         )
 
-                        ; (printf "ust-satz: %d\n" ustsatz)
+                        ; (display (format #f "ust-satz: ~d\n" ustsatz))
                         (set! ustnumeric (double-to-gnc-numeric ustsatz 100 GNC-RND-ROUND))
 
                         ; ust berechnen
@@ -1020,13 +1020,13 @@
 
                         ; aufsummieren, hier kann kein rundungsfehler passieren
                         (set! vorsteuer (gnc-numeric-add-fixed vorsteuer saldo))
-                        ; (printf "xxxvorsteuer: %s, sum: %s\n" (gnc-numeric-to-string  saldo) (gnc-numeric-to-string  vorsteuer))
+                        ; (display (format #f "xxxvorsteuer: ~a, sum: ~a\n" (gnc-numeric-to-string  saldo) (gnc-numeric-to-string  vorsteuer)))
                     )
                 )
                 ausgabenaccounts
             )
 
-            (printf "vorsteuer 1: %s\n" (gnc-numeric-to-string vorsteuer))
+            (display (format #f "vorsteuer 1: ~a\n" (gnc-numeric-to-string vorsteuer)))
             ; Eingekaufte anlagen
             (let (
                     ; (query (gnc:malloc-query))
@@ -1061,11 +1061,11 @@
                                 ;if (> ustsatz 0)
                                 (if ustsatz
                                     (begin
-                                        (printf "afa einkauf: bank-value: %s, ust satz: %d\n" (gnc-numeric-to-string bank-split-value) ustsatz)
+                                        (display (format #f "afa einkauf: bank-value: ~a, ust satz: ~d\n" (gnc-numeric-to-string bank-split-value) ustsatz))
                                         ; aufsummieren
                                         (set! vorsteuer (gnc-numeric-add-fixed vorsteuer 
                                             (gnc-numeric-neg (get-ust-from-brutto bank-split-value ustsatz))))
-                                        ; (printf "xxxvorsteuer: %s , sum: %s\n" (gnc-numeric-to-string  (gnc-numeric-neg (get-ust-from-brutto bank-split-value ustsatz))) (gnc-numeric-to-string  vorsteuer))
+                                        ; (display (format #f "xxxvorsteuer: ~a , sum: ~a\n" (gnc-numeric-to-string  (gnc-numeric-neg (get-ust-from-brutto bank-split-value ustsatz))) (gnc-numeric-to-string  vorsteuer)))
                                     )
                                 )
                                 ; geht nicht, afa eroeffnung wird als fehler erkannt:
@@ -1084,7 +1084,7 @@
                 (qof-query-destroy query)
             )
 
-            (printf "vorsteuer2: %s\n" (gnc-numeric-to-string vorsteuer))
+            (display (format #f "vorsteuer2: ~a\n" (gnc-numeric-to-string vorsteuer)))
 
             (if (numeric-delta-compare vorsteuer eurvorsteuersaldo 1)
                 (html-add-text doc
@@ -1122,10 +1122,10 @@
             ; Summe vorsteuer aus allen einkaeufen
             (vorsteuer numeric0)
 
-            (startdate (gnc:timepair-start-day-time
+            (startdate (gnc:time64-start-day-time
                 (gnc:date-option-absolute-time 
                     (report-get-option report-obj gnc:pagename-general optname-from-date))))
-            (enddate (gnc:timepair-end-day-time 
+            (enddate (gnc:time64-end-day-time
                 (gnc:date-option-absolute-time 
                     (report-get-option report-obj gnc:pagename-general optname-to-date))))
 
@@ -1135,14 +1135,14 @@
         )
         (html-add-text doc "<h2>Ergebnis Pruefung des Jahresabschluss:</h2>")
 
-        (html-add-text doc "Vom " (gnc-print-date startdate) " bis " (gnc-print-date enddate) "</p>")
+        (html-add-text doc "Vom " (qof-print-date startdate) " bis " (qof-print-date enddate) "</p>")
 
         (html-add-text doc "<p><h4>Pruefe Saldierungen (NullSaldo-Flag):</h4></p>")
 
         ; Saldierung auf 0 pruefen
         (map (lambda (account)
 
-                (printf "Saldierung auf 0 pruefen, acc: %s %s\n" (xaccAccountGetCode account) (xaccAccountGetDescription account))
+                (display (format #f "Saldierung auf 0 pruefen, acc: ~a ~a\n" (xaccAccountGetCode account) (xaccAccountGetDescription account)))
 
                 (jaTestNullSaldo doc account enddate)
             )
@@ -1154,7 +1154,7 @@
         ; Saldierung auf 0 pruefen
         (map (lambda (account)
 
-                (printf "Saldierung auf 0 pruefen, acc: %s %s\n" (xaccAccountGetCode account) (xaccAccountGetDescription account))
+                (display (format #f "Saldierung auf 0 pruefen, acc: ~a ~a\n" (xaccAccountGetCode account) (xaccAccountGetDescription account)))
 
                 (jaTestTotalNullSaldo doc account enddate)
             )
@@ -1213,15 +1213,15 @@
             (netto-value (xaccSplitGetValue netto-split))
         )
 
-        (printf "add-tara-split value<")
+        (display "add-tara-split value<")
         (display tara-value)
-        (printf ">\n")
+        (display ">\n")
 
         (html-add-text doc ", Tara Split wird angelegt...<br>")
 
-        (printf "add-tara-split tara-account<")
+        (display "add-tara-split tara-account<")
         (display tara-account)
-        (printf ">\n")
+        (display ">\n")
 
         ; Neuen Tara split einfuegen
         (xaccTransBeginEdit trn)
@@ -1255,9 +1255,9 @@
             (account-guid (gncAccountGetGUID account))
         )
 
-        (printf "notused-add-ust-split value<")
+        (display "notused-add-ust-split value<")
         (display ust-value)
-        (printf ">\n")
+        (display ">\n")
 
         (html-add-text doc ", UST split wird angelegt...")
 
@@ -1284,9 +1284,9 @@
             ;; aktiva-accounts
         ;; )
 
-        (printf "add-ust-split ust-account<")
+        (display "add-ust-split ust-account<")
         (display ust-account)
-        (printf ">\n")
+        (display ">\n")
 
         ; Neuen UST split einfuegen
         (if ust-account
@@ -1325,9 +1325,9 @@
             (account-guid (gncAccountGetGUID account))
         )
 
-        (printf "add-vorsteuer-split value<")
+        (display "add-vorsteuer-split value<")
         (display ust-value)
-        (printf ">\n")
+        (display ">\n")
 
         (html-add-text doc ", Vorsteuer split wird angelegt...")
 
@@ -1354,9 +1354,9 @@
             ;; aktiva-accounts
         ;; )
 
-        (printf "add-vorsteuer-split ust-account<")
+        (display "add-vorsteuer-split ust-account<")
         (display ust-account)
-        (printf ">\n")
+        (display ">\n")
 
         ; Neuen Vorsteuer split einfuegen
         (if ust-account
@@ -1465,7 +1465,7 @@
     (let (
             (accnr (get-split-knr doc (car splits)))
         )
-        ; (printf "listlen: %d %s %s\n" (length splits) knr accnr)
+        ; (display (format #f "listlen: ~d ~a ~a\n" (length splits) knr accnr))
         (if (string=? accnr knr)
             (car splits)
             (if (> (length splits) 1)
@@ -1499,8 +1499,8 @@
             (neg-brutto-value (gnc-numeric-neg brutto-value))
         )
 
-        (printf "ntara-desc: %s\n" ntara-desc)
-        (printf "btara-desc: %s\n" btara-desc)
+        (display (format #f "ntara-desc: ~a\n" ntara-desc))
+        (display (format #f "btara-desc: ~a\n" btara-desc))
 
         (if ntara-desc
             (if (= (string-suffix-length ntara-desc "%") 1)
@@ -1533,7 +1533,7 @@
            (netto-value (xaccSplitGetValue netto-split))
         )
 
-        (printf "tara account: %s, brutto: %s, netto: %s\n" tara-account-desc (gnc-numeric-to-string brutto-value) (gnc-numeric-to-string netto-value))
+        (display (format #f "tara account: ~a, brutto: ~a, netto: ~a\n" tara-account-desc (gnc-numeric-to-string brutto-value) (gnc-numeric-to-string netto-value)))
         ;
         ; Positiver wert: soll
         ; Negativer wert: haben
@@ -1541,11 +1541,11 @@
         (if (= 1 (gnc-numeric-compare netto-value numeric0))
             (begin
                 (set! tara-account-number (get-tara-soll-gk doc tara-account-desc))
-                (printf "soll-fall gk: %s\n" tara-account-number)
+                (display (format #f "soll-fall gk: ~a\n" tara-account-number))
             )
             (begin
                 (set! tara-account-number (get-tara-haben-gk doc tara-account-desc))
-                (printf "haben-fall gk: %s\n" tara-account-number)
+                (display (format #f "haben-fall gk: ~a\n" tara-account-number))
             )
         )
 
@@ -1560,13 +1560,13 @@
                             (tara-value (xaccSplitGetValue tara-split))
                             (tara-value-computed (compute-tara-value doc (xaccSplitGetAccount tara-split) brutto-value))
                         )
-                        (printf "tara split:\n")
+                        (display "tara split:\n")
                         (display tara-split)
-                        (printf "\ntara value aus split:\n")
+                        (display "\ntara value aus split:\n")
                         (display tara-value)
-                        (printf "\ntara value computed:\n")
+                        (display "\ntara value computed:\n")
                         (display tara-value-computed)
-                        (printf "\n")
+                        (display "\n")
                         (if (= (gnc-numeric-compare tara-value tara-value-computed) 0)
                             (if (> (length tara-accounts) 1)
                                 (begin
@@ -1577,7 +1577,7 @@
                             )
                             ; Split Nicht OK
                             (begin
-                                (printf "\nError, tara-value: %s, tara-value-computed: %s\n\n" (gnc-numeric-to-string tara-value) (gnc-numeric-to-string tara-value-computed))
+                                (display (format #f "\nError, tara-value: ~a, tara-value-computed: ~a\n\n" (gnc-numeric-to-string tara-value) (gnc-numeric-to-string tara-value-computed)))
                                 (html-add-text doc "Tara Wert f&uuml;r Gegenkonto '" (xaccAccountGetName (find-acc-by-code tara-account-number)) "' '" tara-account-number "' in Transaktion '") (html-add-trn doc trn)
                                 (html-add-text doc "' stimmt nicht (" (gnc-numeric-to-string tara-value) " ; " (gnc-numeric-to-string tara-value-computed) ")" (redText "NOTOK") "<br>")
                             )
@@ -1634,11 +1634,11 @@
             (create-tara-splits (report-get-option report-obj gnc:pagename-general optname-enter-tax-splits))
 
             ; Start- und enddatum des zu ueberpruefenden bereiches
-            (begindate (gnc:timepair-start-day-time
+            (begindate (gnc:time64-start-day-time
                 (gnc:date-option-absolute-time 
                     (report-get-option report-obj gnc:pagename-general optname-from-date))))
 
-            (enddate (gnc:timepair-end-day-time 
+            (enddate (gnc:time64-end-day-time
                 (gnc:date-option-absolute-time 
                     (report-get-option report-obj gnc:pagename-general optname-to-date))))
         )
@@ -1653,7 +1653,7 @@
 
         (html-add-text doc "<h2>Ergebnis Buchungspr&uuml;fung:</h2>")
         (html-add-text doc "<p>Es wird geprueft, ob die Buchungen auf die geforderten Gegenkonten durchgefuehrt wurden.</p>")
-        (html-add-text doc "<p>Pr&uuml;fe Buchungen vom " (gnc-print-date begindate) " bis " (gnc-print-date enddate) "</p>")
+        (html-add-text doc "<p>Pr&uuml;fe Buchungen vom " (qof-print-date begindate) " bis " (qof-print-date enddate) "</p>")
 
         (if create-tara-splits
             (html-add-text doc "<p>Fehlende Splits werden angelegt.<p>")
@@ -1672,9 +1672,9 @@
 
                     (html-add-text doc "<p>" (greenText "Konto") " '" (xaccAccountGetName account) "' '" (xaccAccountGetCode account) "' '" (xaccAccountGetDescription account)  "'</p>")
 
-                    (printf "\ntara accounts for %s:\n" (xaccAccountGetName account))
+                    (display (format #f "\ntara accounts for ~a:\n" (xaccAccountGetName account)))
                     (display tara-accounts)
-                    (printf "\n")
+                    (display "\n")
 
                     (let (
 	                        (query (qof-query-create-for-splits))
@@ -1690,7 +1690,7 @@
                         ;    than the end date.  If both flags are set, then *both*                                                  
                         ;    conditions must hold ('and').  If neither flag is set, then                                             
                         ;    all transactions are matched.                                                                           
-                        (xaccQueryAddDateMatchTS query #t begindate #t enddate QOF-QUERY-AND)
+                        (xaccQueryAddDateMatchTT query #t begindate #t enddate QOF-QUERY-AND)
 
                         ; Schleife ueber alle buchungen im konto...
                         (map (lambda (trn)
@@ -1714,9 +1714,9 @@
                                     ; brutto-split suchen
                                     (set! brutto-value (get-brutto-value-by-sign doc (get-tara-accounts-as-string-list tara-accounts (get-account-knr doc account)) splits (xaccSplitGetValue netto-split)))
 
-                                    ; (printf "brutto value\n")
+                                    ; (display "brutto value\n")
                                     ; (display brutto-value)
-                                    ; (printf "\n")
+                                    ; (display "\n")
 
                                     (check-tara-splits doc trn netto-split splits tara-accounts brutto-value create-tara-splits)
                                 )
@@ -1753,13 +1753,13 @@
 ;;;;; (define my-current-session #f)
 ;;;;; (define (my-book-opened-hook session)
   ;;;;; (begin
-    ;;;;; (printf "my-book-opened-hook called\n")
+    ;;;;; (display "my-book-opened-hook called\n")
     ;;;;; (set! my-current-session session)
   ;;;;; )
 ;;;;; )
 ;;;;; (define (my-book-closed-hook session)
   ;;;;; (begin
-    ;;;;; (printf "my-book-closed-hook called\n")
+    ;;;;; (display "my-book-closed-hook called\n")
     ;;;;; (set! my-current-session #f)
   ;;;;; )
 ;;;;; )
@@ -1822,18 +1822,18 @@
                         (xaccSplitSetAccount afa-split ausgaben-konto)
                         (xaccSplitSetParent afa-split afa-trn)
 
-                        (printf "DAtum neue trans: %d.%d.%d\n"  tday tmon tyear)
+                        (display (format #f "DAtum neue trans: ~d.~d.~d\n"  tday tmon tyear))
 
-                        ; (display afa-date) (printf " <afa-date\n")
+                        ; (display afa-date) (display " <afa-date\n")
 
-                        ; (xaccTransSetDatePostedTS afa-trn (gnc:date->timepair afa-date))
-                        ; (display (gnc:date->timepair afa-date)) (printf " <afa-date timespair\n")
-                        ; (display (gnc-timepair2timespec (gnc:date->timepair afa-date))) (printf " <afa-date timespec\n")
+                        ; (xaccTransSetDatePostedTS afa-trn (gnc-mktime afa-date))
+                        ; (display (gnc-mktime afa-date)) (display " <afa-date timespair\n")
+                        ; (display (scm-to-int64 (gnc-mktime afa-date))) (display " <afa-date timespec\n")
 
-                        ; (xaccTransSetDatePostedTS afa-trn (gnc-timepair2timespec (gnc:date->timepair afa-date)))
+                        ; (xaccTransSetDatePostedTS afa-trn (scm-to-int64 (gnc-mktime afa-date)))
 
                         ; (xaccTransSetDatePostedGDate afa-trn afa-date)
-                        ; (xaccTransSetDateEnteredTS afa-trn (gnc:date->timepair afa-date))
+                        ; (xaccTransSetDateEnteredTS afa-trn (gnc-mktime afa-date))
                         (xaccTransSetDate afa-trn tday tmon tyear)
 
                         (xaccTransSetDescription afa-trn (afa-desc (string-append "AFA " (number->string i)) trn))
@@ -1859,11 +1859,11 @@
 ; Eine transaktion fuer jedes jahr der abschreibungsdauer in das abschreibungskonto eintragen,
 ; kauf im zweiten halbjahr beruecksichtigen
 (define (afa-vorbereitung-afa doc trn anl-split ndauer)
-    (printf "afa-vorbereitung-afa called\n")
+    (display "afa-vorbereitung-afa called\n")
     (let (
-            (kauf-datum (gnc-transaction-get-date-posted trn))
-            ; (afa-datum (gnc:timepair->date (gnc-transaction-get-date-posted trn)))
-            (kauf-jahr (gnc:timepair-get-year (gnc-transaction-get-date-posted trn)))
+            (kauf-datum (xaccTransGetDate trn))
+            ; (afa-datum (gnc-localtime (xaccTransGetDate trn)))
+            (kauf-jahr (gnc:time64-get-year (xaccTransGetDate trn)))
             (notusedafa-datum #f)
             (normal-afa-value (compute-afa-value anl-split ndauer))
             (first-afa-value #f)
@@ -1876,10 +1876,10 @@
             (value-diff #f)
             ; (accgroup (gnc:book-get-group (gnc-get-current-book)))
             (notused_accgroup #f)
-            (kaufMonate (- 13 (gnc:timepair-get-month (gnc-transaction-get-date-posted trn))))
+            (kaufMonate (- 13 (gnc:time64-get-month (xaccTransGetDate trn))))
             (monatsAfa (compute-afa-value anl-split (* 12 ndauer)))
         )
-        (gnc:warn "kauf-datum" (gnc:timepair->date kauf-datum))
+        (gnc:warn "kauf-datum" (gnc-localtime kauf-datum))
         (gnc:warn "anlage betrag: " (xaccSplitGetValue anl-split))
         (gnc:warn "afa betrag: " normal-afa-value)
         (gnc:warn "Monate anteilig: " kaufMonate)
@@ -1887,7 +1887,7 @@
         ;
         ; Alte regelung mit kauf im 2. halbjahr, gilt seit 2004 nicht mehr:
         ;
-        ;(if (> (gnc:timepair-get-month kauf-datum) 6) ; kauf im 2. halbjahr ?
+        ;(if (> (gnc:time64-get-month kauf-datum) 6) ; kauf im 2. halbjahr ?
             ;(begin
                 ;(set! first-afa-value (compute-afa-value anl-split (* 2 ndauer))) ; halbe afa
             ;)
@@ -1923,7 +1923,7 @@
 
         ; (set-tm:year afa-datum (+ (tm:year afa-datum) 1))
         (set! kauf-jahr (+ kauf-jahr 1))
-        (if (> (gnc:timepair-get-month kauf-datum) 6) ; kauf im 2. halbjahr ?
+        (if (> (gnc:time64-get-month kauf-datum) 6) ; kauf im 2. halbjahr ?
             (begin
                 (set! last-afa-trn (afa-vorbereitung-add-trn doc trn anl-split notusedafa-datum first-afa-value (+ ndauer 1) 31 12 kauf-jahr))
                 (set! afa-value-sum (gnc-numeric-add-fixed afa-value-sum first-afa-value))
@@ -2029,7 +2029,7 @@
 
 ; afa - transaktionen fuer eine anlage erzeugen/aktualisieren
 (define (afa-vorbereitung-trn doc trn anl-split)
-    (printf "afa-vorbereitung-trn\n")
+    (display "afa-vorbereitung-trn\n")
 
     (html-add-text doc "<p>Abschreibungen fuer '" (xaccTransGetDescription trn) "' ")
     (html-add-trn doc trn)
@@ -2089,7 +2089,7 @@
                         (html-add-text doc "<h3>Konto '" (xaccAccountGetName anlagenaccount) "' ("
                             (get-account-knr doc anlagenaccount) ")</h2>")
 
-                        (printf "Doing acc: %s\n" (xaccAccountGetName anlagenaccount))
+                        (display (format #f "Doing acc: ~a\n" (xaccAccountGetName anlagenaccount)))
 
                         (qof-query-set-book query (gnc-get-current-book))
                         (xaccQueryAddSingleAccountMatch query anlagenaccount QOF-QUERY-AND)
@@ -2138,10 +2138,10 @@
                 ; (html-add-text doc "<h3>Konto '" (xaccAccountGetName afaaccount) "' ("
                     ; (get-account-knr doc afaaccount) ")</h2>")
 
-                ; (printf "Doing acc: %s\n" (xaccAccountGetName afaaccount))
+                ; (display (format #f "Doing acc: ~a\n" (xaccAccountGetName afaaccount)))
 
-                (display anlagen) (printf " <anlagen\n")
-                (display afabuchungen) (printf " <afa-afabuchungen\n")
+                (display anlagen) (display " <anlagen\n")
+                (display afabuchungen) (display " <afa-afabuchungen\n")
 
                 ; sortierte liste der anlagen abarbeiten, afa buchungen nur erzeugen, falls noch keine 
                 ; vorhanden
@@ -2191,10 +2191,10 @@
                 ; hash mit allen afa und abgangs buchungen
                 (afabuchungen (make-hash-table 1))
 
-                (startdate (gnc:timepair-start-day-time
+                (startdate (gnc:time64-start-day-time
                     (gnc:date-option-absolute-time 
                         (report-get-option report-obj gnc:pagename-general optname-from-date))))
-                (enddate (gnc:timepair-end-day-time 
+                (enddate (gnc:time64-end-day-time
                     (gnc:date-option-absolute-time 
                         (report-get-option report-obj gnc:pagename-general optname-to-date))))
                 (do-report (report-get-option report-obj gnc:pagename-general optname-run-afa-buchung))
@@ -2213,7 +2213,7 @@
                         (html-add-text doc "<h3>Konto '" (xaccAccountGetName anlagenaccount) "' ("
                             (get-account-knr doc anlagenaccount) ")</h2>")
 
-                        (printf "Doing acc: %s\n" (xaccAccountGetName anlagenaccount))
+                        (display (format #f "Doing acc: ~a\n" (xaccAccountGetName anlagenaccount)))
 
                         (qof-query-set-book query (gnc-get-current-book))
                         (xaccQueryAddSingleAccountMatch query anlagenaccount QOF-QUERY-AND)
@@ -2262,10 +2262,10 @@
                 ; (html-add-text doc "<h3>Konto '" (xaccAccountGetName afaaccount) "' ("
                     ; (get-account-knr doc afaaccount) ")</h2>")
 
-                ; (printf "Doing acc: %s\n" (xaccAccountGetName afaaccount))
+                ; (display (format #f "Doing acc: ~a\n" (xaccAccountGetName afaaccount)))
 
-                (display anlagen) (printf " <anlagen\n")
-                (display afabuchungen) (printf " <afa-afabuchungen\n")
+                (display anlagen) (display " <anlagen\n")
+                (display afabuchungen) (display " <afa-afabuchungen\n")
 
                 ; sortierte liste der anlagen abarbeiten, afa buchungen nur erzeugen, falls noch keine 
                 ; vorhanden
@@ -2303,17 +2303,17 @@
 ; aber es ist nicht klar wie diese sich verhaelt wenn die beiden waehrungen aus verschiedenen
 ; buechern stammen. Desshalb vergleich ueber Waehrungskurzname.
 (define (waehrungs-vergleich ca cb)
-    ; (printf "waehrung a: '%s', b: '%s'\n" (gnc-commodity-get-mnemonic ca) (gnc-commodity-get-mnemonic cb))
+    ; (display (format #f "waehrung a: '~a', b: '~a'\n" (gnc-commodity-get-mnemonic ca) (gnc-commodity-get-mnemonic cb)))
     (string=? (gnc-commodity-get-mnemonic ca) (gnc-commodity-get-mnemonic cb))
 )
 
 ; gnc:is-euro-currency geht nicht !?
 (define (ist-euro-waehrung c)
-    ; (printf "waehrung: '%s'\n" (gnc-commodity-get-mnemonic c))
+    ; (display (format #f "waehrung: '~a'\n" (gnc-commodity-get-mnemonic c)))
     (string=? (gnc-commodity-get-mnemonic c) "EUR")
 )
 
-; liefert timepair fuer bestimmtes datum fuer query/transaktions datum
+; liefert time64 fuer bestimmtes datum fuer query/transaktions datum
 (define (get-TPTS-at-date sec minu hr day mon year)
     (let (
             (tmDate (localtime (current-time)))
@@ -2325,7 +2325,7 @@
         (set-tm:mon tmDate (- mon 1))
         (set-tm:year tmDate (- year 1900))
         (set-tm:isdst tmDate -1)
-        (gnc:date->timepair tmDate)
+        (gnc:gnc-mktime tmDate)
     )
 )
 
@@ -2367,12 +2367,12 @@
             (enddate (get-TPTS-at-date 59 59 23 31 12 year))
         )
 
-        ; (printf "year %d\n" year)
+        ; (display (format #f "year ~d\n" year))
         (qof-query-set-book query (qof-session-get-book session))
         (xaccQueryAddSingleAccountMatch query account QOF-QUERY-AND)
         ; (qof-query-set-sort-order query (list QUERY-DEFAULT-SORT) '() '())
         ; (qof-query-set-sort-order query (list gnc:split-trans gnc-trans-date-posted) '() '())
-        ; (gnc:query-add-date-match-timepair query 
+        ; (xaccQueryAddDateMatchTT query
             ; #f enddate
             ; #t enddate QOF-QUERY-AND)
 
@@ -2383,7 +2383,7 @@
         ;    than the end date.  If both flags are set, then *both*                                                  
         ;    conditions must hold ('and').  If neither flag is set, then                                             
         ;    all transactions are matched.                                                                           
-        (xaccQueryAddDateMatchTS query
+        (xaccQueryAddDateMatchTT query
              #f enddate
              #t enddate QOF-QUERY-AND)
 
@@ -2404,11 +2404,11 @@
             (enddate (get-TPTS-at-date 59 59 23 31 12 year))
         )
 
-        ; (printf "year %d\n" year)
+        ; (display (format #f "year ~d\n" year))
         (qof-query-set-book query (qof-session-get-book session))
         (xaccQueryAddSingleAccountMatch query account QOF-QUERY-AND)
         (qof-query-set-sort-order query (list QUERY-DEFAULT-SORT) '() '())
-        (gnc:query-add-date-match-timepair query 
+        (xaccQueryAddDateMatchTT query
             #f enddate
             #t enddate QOF-QUERY-AND)
 
@@ -2430,11 +2430,11 @@
             (enddate (get-TPTS-at-date 59 59 23 31 12 year))
         )
 
-        ; (printf "year %d\n" year)
+        ; (display (format #f "year ~d\n" year))
         (qof-query-set-book query (qof-session-get-book session))
         (xaccQueryAddSingleAccountMatch query account QOF-QUERY-AND)
         (qof-query-set-sort-order query (list QUERY-DEFAULT-SORT) '() '())
-        ; (gnc:query-add-date-match-timepair query 
+        ; (xaccQueryAddDateMatchTT query
             ; #f enddate
             ; #t enddate QOF-QUERY-AND)
         ; The DateMatch queries match transactions whose posted date                                                 
@@ -2444,7 +2444,7 @@
         ;    than the end date.  If both flags are set, then *both*                                                  
         ;    conditions must hold ('and').  If neither flag is set, then                                             
         ;    all transactions are matched.                                                                           
-        (xaccQueryAddDateMatchTS query
+        (xaccQueryAddDateMatchTT query
              #f enddate
              #t enddate QOF-QUERY-AND)
 
@@ -2465,14 +2465,14 @@
             (accounts (gnc-account-get-descendants-sorted root))
         )
 
-        ; (printf "year %d\n" year)
+        ; (display (format #f "year ~d\n" year))
         (qof-query-set-book query book)
         (if (null? accounts)
             (xaccQueryAddSingleAccountMatch query root QOF-QUERY-AND)
             (xaccQueryAddAccountMatch query accounts QOF-GUID-MATCH-ANY QOF-QUERY-AND)
         )
         (qof-query-set-sort-order query (list QUERY-DEFAULT-SORT) '() '())
-        ; (gnc:query-add-date-match-timepair query 
+        ; (xaccQueryAddDateMatchTT query
             ; #f enddateTPTS
             ; #t enddateTPTS QOF-QUERY-AND)
         ; The DateMatch queries match transactions whose posted date                                                 
@@ -2482,7 +2482,7 @@
         ;    than the end date.  If both flags are set, then *both*                                                  
         ;    conditions must hold ('and').  If neither flag is set, then                                             
         ;    all transactions are matched.                                                                           
-        (xaccQueryAddDateMatchTS query
+        (xaccQueryAddDateMatchTT query
              #f enddateTPTS
              #t enddateTPTS QOF-QUERY-AND)
 
@@ -2551,7 +2551,7 @@
             (enddateTMDATE (localtime (current-time)))
             (enddateTPTS #f)
 
-            (year (gnc:timepair-get-year 
+            (year (gnc:time64-get-year
                 (gnc:date-option-absolute-time 
                     (report-get-option report-obj gnc:pagename-general optname-to-date))))
 
@@ -2566,10 +2566,10 @@
         ; d2 = (gnc:date-option-absolute-time d1)
         ; --> (1356994799 . 0)                              # format: timepair, TPTS
 
-        ; d3 = (gnc:timepair->date d2)
+        ; d3 = (gnc-localtime d2)
         ; --> #(59 59 23 31 11 112 1 365 0 -3600 CET)       # format: TMDATE
 
-        ; d4 = (gnc:timepair-start-day-time d2)
+        ; d4 = (gnc:time64-start-day-time d2)
         ; --> (1356908400 . 0)                              # format: timepair, TPTS
 
         (set-tm:sec     restdateTMDATE 0)
@@ -2579,9 +2579,9 @@
         (set-tm:mon     restdateTMDATE 0)
         (set-tm:year    restdateTMDATE (- year 1900))
         (set-tm:isdst   restdateTMDATE -1)
-        (set! restdateTPTS (gnc:date->timepair restdateTMDATE))
+        (set! restdateTPTS (gnc-mktime restdateTMDATE))
 
-        (display restdateTPTS) (printf " <restdate : %s\n" (gnc-print-date restdateTPTS))
+        (display restdateTPTS) (display (format #f " <restdate : ~a\n" (qof-print-date restdateTPTS)))
 
         (set-tm:sec     enddateTMDATE 59)
         (set-tm:min     enddateTMDATE 59)
@@ -2590,12 +2590,12 @@
         (set-tm:mon     enddateTMDATE 11)
         (set-tm:year    enddateTMDATE (- year 1900))
         (set-tm:isdst   enddateTMDATE -1)
-        (set! enddateTPTS (gnc:date->timepair enddateTMDATE))
+        (set! enddateTPTS (gnc-mktime enddateTMDATE))
 
-        (display enddateTPTS) (printf " <enddate : %s\n" (gnc-print-date enddateTPTS))
+        (display enddateTPTS) (display (format #f " <enddate : ~a\n" (qof-print-date enddateTPTS)))
 
-        (html-add-text doc "<h2>Entwicklung Anlagevermoegen bis zum " (gnc-print-date enddateTPTS) "</h2>")
-        (html-add-text doc "<p>Stand: " (gnc-print-date (gnc:get-today)) ", Betr&auml;ge in " (gnc-commodity-get-mnemonic euroCurrency) "</p>")
+        (html-add-text doc "<h2>Entwicklung Anlagevermoegen bis zum " (qof-print-date enddateTPTS) "</h2>")
+        (html-add-text doc "<p>Stand: " (qof-print-date (gnc:get-today)) ", Betr&auml;ge in " (gnc-commodity-get-mnemonic euroCurrency) "</p>")
 
         ;
         ; Die anlagen konten ZWEIMAL durchgehen, im ersten schritt
@@ -2630,13 +2630,13 @@
                         (table-not-empty #f)
                     )
 
-                    (printf "anlagespiegel fuer konto: %s/%s\n" (xaccAccountGetName anlagenaccount) (xaccAccountGetDescription anlagenaccount))
+                    (display (format #f "anlagespiegel fuer konto: ~a/~a\n" (xaccAccountGetName anlagenaccount) (xaccAccountGetDescription anlagenaccount)))
 
                     ; Schleife ueber alle buchungen im anlagen konto
                     (for-each (lambda (split)
                                 
                             (let (
-                                    (splityear (gnc:timepair-get-year (gnc-transaction-get-date-posted (xaccSplitGetParent split))))
+                                    (splityear (gnc:time64-get-year (xaccTransGetDate (xaccSplitGetParent split))))
                                     (anl-nr (get-pseudo-kvp (xaccSplitGetMemo split) "ANL-NR"))
                                     (erw-nr (get-pseudo-kvp (xaccSplitGetMemo split) "ERW-NR"))
                                     (afa-nr (get-pseudo-kvp (xaccSplitGetMemo split) "AFA-NR"))
@@ -2645,7 +2645,7 @@
 
                                 (if anl-nr
                                     (begin
-                                        (printf "anl-nr: %s\n" anl-nr)
+                                        (display (format #f "anl-nr: ~a\n" anl-nr))
                                         ; Anlagen buchung
                                         (set! anlagen (append anlagen (list split)))
                                         ;
@@ -2662,7 +2662,7 @@
                                         ;
                                         ; Buchung nur beruecksichtigen, falls im berichtsjahr
                                         ;
-                                        (printf "anl-nr: %s\n" anl-nr)
+                                        (display (format #f "anl-nr: ~a\n" anl-nr))
                                         (if (= year splityear)
                                             (hash-set-add-numeric erweiterungen erw-nr (xaccSplitGetValue split))
                                         )
@@ -2671,7 +2671,7 @@
                                 
                                 (if afa-nr
                                     (begin
-                                        ; (printf "afa-nr: %s\n" afa-nr)
+                                        ; (display (format #f "afa-nr: ~a\n" afa-nr))
                                         ;
                                         ; Buchung nur beruecksichtigen, falls im berichtsjahr
                                         ;
@@ -2691,7 +2691,7 @@
                         splits
                     )
 
-                    ; (display afabuchungen) (printf " <afa-afabuchungen\n")
+                    ; (display afabuchungen) (display " <afa-afabuchungen\n")
 
                     (gnc:html-document-set-style! doc "table" 'attribute (list "border" 1))
 
@@ -2720,10 +2720,10 @@
                                     (erwvalue (hash-ref erweiterungen (get-pseudo-kvp (xaccSplitGetMemo split) "ANL-NR")))
                                     (abgsplit (hash-ref abgaenge (get-pseudo-kvp (xaccSplitGetMemo split) "ANL-NR")))
                                     (endwert (hash-ref endwerte (get-pseudo-kvp (xaccSplitGetMemo split) "ANL-NR")))
-                                    (trn-year (gnc:timepair-get-year (gnc-transaction-get-date-posted (xaccSplitGetParent split))))
+                                    (trn-year (gnc:time64-get-year (xaccTransGetDate (xaccSplitGetParent split))))
                                 )
 
-                                ; (display (xaccSplitGetValue afasplit) (printf " <-afa value\n"))
+                                ; (display (xaccSplitGetValue afasplit) (display (format #f " <-afa value\n")))
 
                                 (if restwert
 
@@ -2765,7 +2765,7 @@
                                                 ; nummer, bezeichnung
                                                 (string-append (xaccTransGetNum trn) "<br>" (xaccTransGetDescription trn))
                                                 ; Anschaffungsdatum, wert
-                                                (string-append (gnc-print-date (gnc-transaction-get-date-posted trn)) "<br>" (num-to-text (comm-umrechnung doc anlagenaccount (xaccSplitGetValue split) euroCurrency)))
+                                                (string-append (qof-print-date (xaccTransGetDate trn)) "<br>" (num-to-text (comm-umrechnung doc anlagenaccount (xaccSplitGetValue split) euroCurrency)))
                                                 ; restwert 1.1.
                                                 restwert-str
                                                 ; zuschreibungen
@@ -2774,7 +2774,7 @@
                                                 (string-append "linear<br>" ndauer-string "<br>" (sprintf #f "%.2f" prozent))
                                                 ; Abgang
                                                 (if abgsplit
-                                                    (gnc-print-date (gnc-transaction-get-date-posted (xaccSplitGetParent abgsplit)))
+                                                    (qof-print-date (xaccTransGetDate (xaccSplitGetParent abgsplit)))
                                                     ""
                                                 )
                                                 ; afa
@@ -2852,13 +2852,13 @@
                         (table-not-empty #f)
                     )
 
-                    (printf "anlagespiegel fuer konto: %s/%s\n" (xaccAccountGetName anlagenaccount) (xaccAccountGetDescription anlagenaccount))
+                    (display (format #f "anlagespiegel fuer konto: ~a/~a\n" (xaccAccountGetName anlagenaccount) (xaccAccountGetDescription anlagenaccount)))
 
                     ; Schleife ueber alle buchungen im anlagen konto
                     (for-each (lambda (split)
                                 
                             (let (
-                                    (splityear (gnc:timepair-get-year (gnc-transaction-get-date-posted (xaccSplitGetParent split))))
+                                    (splityear (gnc:time64-get-year (xaccTransGetDate (xaccSplitGetParent split))))
                                     (anl-nr (get-pseudo-kvp (xaccSplitGetMemo split) "ANL-NR"))
                                     (erw-nr (get-pseudo-kvp (xaccSplitGetMemo split) "ERW-NR"))
                                     (afa-nr (get-pseudo-kvp (xaccSplitGetMemo split) "AFA-NR"))
@@ -2867,7 +2867,7 @@
 
                                 (if anl-nr
                                     (begin
-                                        (printf "anl-nr: %s\n" anl-nr)
+                                        (display (format #f "anl-nr: ~a\n" anl-nr))
                                         ; Anlagen buchung
                                         (set! anlagen (append anlagen (list split)))
                                         ;
@@ -2890,7 +2890,7 @@
                                 
                                 (if afa-nr
                                     (begin
-                                        ; (printf "afa-nr: %s\n" afa-nr)
+                                        ; (display (format #f "afa-nr: ~a\n" afa-nr))
                                         ;
                                         ; Buchung nur beruecksichtigen, falls im berichtsjahr
                                         ;
@@ -2910,7 +2910,7 @@
                         splits
                     )
 
-                    ; (display afabuchungen) (printf " <afa-afabuchungen\n")
+                    ; (display afabuchungen) (display " <afa-afabuchungen\n")
 
                     (gnc:html-document-set-style! doc "table" 'attribute (list "border" 1))
 
@@ -2939,10 +2939,10 @@
                                     (erwvalue (hash-ref erweiterungen (get-pseudo-kvp (xaccSplitGetMemo split) "ANL-NR")))
                                     (abgsplit (hash-ref abgaenge (get-pseudo-kvp (xaccSplitGetMemo split) "ANL-NR")))
                                     (endwert (hash-ref endwerte (get-pseudo-kvp (xaccSplitGetMemo split) "ANL-NR")))
-                                    (trn-year (gnc:timepair-get-year (gnc-transaction-get-date-posted (xaccSplitGetParent split))))
+                                    (trn-year (gnc:time64-get-year (xaccTransGetDate (xaccSplitGetParent split))))
                                 )
 
-                                ; (display (xaccSplitGetValue afasplit) (printf " <-afa value\n"))
+                                ; (display (xaccSplitGetValue afasplit) (display (format #f " <-afa value\n")))
 
                                 (if restwert
 
@@ -2984,7 +2984,7 @@
                                                 ; nummer, bezeichnung
                                                 (string-append (xaccTransGetNum trn) "<br>" (xaccTransGetDescription trn))
                                                 ; Anschaffungsdatum, wert
-                                                (string-append (gnc-print-date (gnc-transaction-get-date-posted trn)) "<br>" (num-to-text (comm-umrechnung doc anlagenaccount (xaccSplitGetValue split) euroCurrency)))
+                                                (string-append (qof-print-date (xaccTransGetDate trn)) "<br>" (num-to-text (comm-umrechnung doc anlagenaccount (xaccSplitGetValue split) euroCurrency)))
                                                 ; restwert 1.1.
                                                 restwert-str
                                                 ; zuschreibungen
@@ -2993,7 +2993,7 @@
                                                 (string-append "linear<br>" ndauer-string "<br>" (sprintf #f "%.2f" prozent))
                                                 ; Abgang
                                                 (if abgsplit
-                                                    (gnc-print-date (gnc-transaction-get-date-posted (xaccSplitGetParent abgsplit)))
+                                                    (qof-print-date (xaccTransGetDate (xaccSplitGetParent abgsplit)))
                                                     ""
                                                 )
                                                 ; afa
@@ -3062,7 +3062,7 @@
             )
         )
 
-        ; (printf "export: %s\n" (list-ref splitted 0))
+        ; (display (format #f "export: ~a\n" (list-ref splitted 0)))
         (if (and mapped-account (not (string=? knr mapped-account)))
             (begin
                 (html-add-text doc (greenText "Wandle") " Kontonummer " knr " in " mapped-account " um!<br>")
@@ -3175,8 +3175,8 @@
         (display ";" outport)
 
         ; 6. "Belegdatum", DDMM
-        (display (sprintf #f "%02d" (gnc:date-get-month-day (gnc:timepair->date (gnc-transaction-get-date-posted trn)))) outport)
-        (display (sprintf #f "%02d" (gnc:timepair-get-month (gnc-transaction-get-date-posted trn))) outport)
+        (display (sprintf #f "%02d" (gnc:date-get-month-day (gnc-localtime (xaccTransGetDate trn)))) outport)
+        (display (sprintf #f "%02d" (gnc:time64-get-month (xaccTransGetDate trn))) outport)
         (display ";" outport)
         
         ; 7. Konto == Sollkonto
@@ -3202,23 +3202,23 @@
         ; * wiederholten whitespace entfernen
         ; * falls immernoch zu lang: zahlen (z.b. kontonummern) aus dem string entfernen
         ;
-        ; (printf "\ns untrimmed: '%s', laenge: %d\n" trndesc (string-length trndesc)) 
+        ; (display (format #f "\ns untrimmed: '~a', laenge: ~d\n" trndesc (string-length trndesc)) )
 
         (set! trndesc (string-filter (string-trim-both trndesc char-set:whitespace) wsFilter))
 
-        ; (printf "s trimmed, removed whitespace '%s', laenge: %d\n" trndesc (string-length trndesc)) 
+        ; (display (format #f "s trimmed, removed whitespace '~a', laenge: ~d\n" trndesc (string-length trndesc)) )
 
         (if (> (string-length trndesc) 30)
             (begin
                 (set! trndesc (number-filter trndesc 0))
-                ; (printf "s removed numbers '%s', laenge: %d\n" trndesc (string-length trndesc)) 
+                ; (display (format #f "s removed numbers '~a', laenge: ~d\n" trndesc (string-length trndesc)) )
             )
         )
 
         (if (> (string-length trndesc) 30)
             (begin
                 (set! trndesc (substring trndesc 0 30))
-                ; (printf "s cutted to 30 chars: '%s'\n" trndesc)
+                ; (display (format #f "s cutted to 30 chars: '~a'\n" trndesc))
             )
         )
 
@@ -3342,26 +3342,26 @@
             (abzug numeric0)
         )
 
-        (printf "ignor acc: %s" (car tara-accounts))
+        (display (format #f "ignor acc: ~a" (car tara-accounts)))
         (display tara-accounts)
-        (printf ">\n")
+        (display ">\n")
         (map (lambda (split)
                 (let (
                         (bruttosign (get-numeric-sign (xaccSplitGetValue split)))
                     )
    
-                    (printf "split-knr: %s\n" (get-split-knr doc split))
+                    (display (format #f "split-knr: ~a\n" (get-split-knr doc split)))
 
-                    (printf "memq")
+                    (display "memq")
                     (display (string-list-contains tara-accounts (get-split-knr doc split)))
-                    (printf ">\n")
+                    (display ">\n")
 
                     ; Vorzeichen vergleichen:
                     (if (= bruttosign (get-numeric-sign netto-value))
                         ; Vorzeichen gleich, ggf. buchungswert aufsummieren
                         (if (not (string-list-contains tara-accounts (get-split-knr doc split)))
                           (begin 
-                            (printf "memq true: %s\n" (get-split-knr doc split))
+                            (display (format #f "memq true: ~a\n" (get-split-knr doc split)))
                             (set! abzug (gnc-numeric-add-fixed abzug (xaccSplitGetValue split))) )
                         )
                         ; Vorzeichen unterschiedlich, brutto-split gefunden:
@@ -3371,12 +3371,12 @@
             )
             splits
         )
-        (printf "found brutto value<")
+        (display "found brutto value<")
         (display bruttovalue)
-        (printf ">\n")
-        (printf "found abzug")
+        (display ">\n")
+        (display "found abzug")
         (display abzug)
-        (printf ">\n")
+        (display ">\n")
         ; Subtrahiere abzug, add wegen negativem vorzeichen
         (gnc-numeric-add-fixed bruttovalue abzug)
     )
@@ -3399,7 +3399,7 @@
             renamedAccounts
         )
 
-        ; (display accountMapping) (printf "<accountMapping\n")
+        ; (display accountMapping) (display "<accountMapping\n")
 
         accountMapping
     )
@@ -3416,13 +3416,13 @@
     (let (
             (book (gnc-get-current-book))
             ; String-replace wegen LANG variable
-            (today-str (my-string-replace-char (gnc-print-date (gnc:get-today))  #\/ #\.))
+            (today-str (my-string-replace-char (qof-print-date (gnc:get-today))  #\/ #\.))
             ; Path
             (pathname (build-path (or (getenv "HOME") (getenv "USERPROFILE")) "gnc_csv_export"))
-            (startdate (gnc:timepair-start-day-time
+            (startdate (gnc:time64-start-day-time
                 (gnc:date-option-absolute-time 
                     (report-get-option report-obj gnc:pagename-general optname-from-date))))
-            (enddate (gnc:timepair-end-day-time 
+            (enddate (gnc:time64-end-day-time
                 (gnc:date-option-absolute-time 
                     (report-get-option report-obj gnc:pagename-general optname-to-date))))
             (do-report (report-get-option report-obj gnc:pagename-general optname-run-cvs-export))
@@ -3434,11 +3434,11 @@
 
             (let (
                     ; Dateiname
-                    (filename (build-path pathname (string-append (number->string (gnc:timepair-get-year startdate)) "_" today-str ".csv")))
+                    (filename (build-path pathname (string-append (number->string (gnc:time64-get-year startdate)) "_" today-str ".csv")))
                     (outport #f)
                 )
 
-                (html-add-text doc "<p>Exportiere Buchungen vom " (gnc-print-date startdate) " bis zum " (gnc-print-date enddate) "</p>")
+                (html-add-text doc "<p>Exportiere Buchungen vom " (qof-print-date startdate) " bis zum " (qof-print-date enddate) "</p>")
                 (html-add-text doc "Name Ausgabedatei: " filename "<br><br>")
 
                 ; Ignore exception if directory exists.
@@ -3461,7 +3461,7 @@
         ;    than the end date.  If both flags are set, then *both*                                                  
         ;    conditions must hold ('and').  If neither flag is set, then                                             
         ;    all transactions are matched.                                                                           
-                        (xaccQueryAddDateMatchTS query
+                        (xaccQueryAddDateMatchTT query
                              #t startdate
                              #t enddate QOF-QUERY-AND)
                         (qof-query-set-sort-order query (list QUERY-DEFAULT-SORT) '() '())
@@ -3855,7 +3855,7 @@
             (menu-path (list (N_ "Extensions") ibr-menu-name))
         )
 
-        (printf "Creating ibr-menu, GnuCash version: %s\n" gnc:version)
+        (display (format #f "Creating ibr-menu, GnuCash version: ~a\n" gnc:version))
 
         (load-from-path "gnc-menu-extensions.scm")
 
@@ -4040,7 +4040,7 @@
             ) ; begin
         ) ; if ibr-debug
 
-        (printf "Create ibr-menu done\n")
+        (display "Create ibr-menu done\n")
 
         (set! ibr-menu-created #t)
 
@@ -4048,8 +4048,4 @@
   )
 )
 
-(printf "End ibr-gnc-module.scm\n")
-
-
-
-
+(display "End ibr-gnc-module.scm\n")
