@@ -21,7 +21,7 @@ Github Mirror, Projekt Homepage
 
 Die aktuellen Quellen gibt es hier: `https://github.com/ErwinRieger/ibr-gnc-module <https://github.com/ErwinRieger/ibr-gnc-module>`_.
 
-Projekt homepage: `http://www.ibrieger.de/gnucash-erweiterungen.html <http://www.ibrieger.de/gnucash-erweiterungen.html>`_.
+Projekt-Webseite: `http://www.ibrieger.de/gnucash-erweiterungen.html <http://www.ibrieger.de/gnucash-erweiterungen.html>`_.
 
 Einleitung
 =============
@@ -35,33 +35,22 @@ Diese Erweiterungen in Form eines Scheme-Moduls stehen unter der
 eigene Gefahr ("save early, save often", Backups machen). Bei Problemen
 oder Anregungen bitte Email an `mich <mailto:erwin.rieger@ibrieger.de>`_.
 
-Die neuen funktionen lassen sich in drei kategorien einteilen:
+Die Funktionen des Moduls lassen sich in drei Kategorien einteilen:
 
-#. 
+#. Prüfung von Buchungen:
 
-   `Prüfung von buchungen </atom.xml#a1>`_:
+   - Prüfung (und ggf. das automatische Anlegen) von Umsatz-/Vorsteuerbuchungen.
+   - Prüfung des Jahresabschluss.
 
--  
-
-   Prüfung (und ggf. das automatische Anlegen) von Umsatz- /
-   Vorsteuerbuchungen.
--  
-
-   Prüfung des Jahresabschluss.
-
-#. 
-
-   `CSV Datenexport für
-   Steuerberater/Datev </atom.xml#a2>`_, Export
-   der Buchungen eines bestimmten Zeitraumes in eine CSV Datei die vom
+#. CSV-Datenexport für Steuerberater/Datev:
+   Export der Buchungen eines bestimmten Zeitraumes in eine CSV Datei die vom
    Steuerberater eingelesen werden kann.
-#. 
 
-   `Verwaltung von anlagen,  AFA </atom.xml#a3>`_
+#. Verwaltung von Anlagen (Abschreibungen, AFA)
+
 
 Installation des IBR Moduls
 =============================
-
  
 
 Unter Windows:
@@ -79,14 +68,15 @@ Unter Windows:
    %userprofile%\\.gnucash kopiert).
 -  
 
-   Die desktop-verknüpfung "GnuCash Extra" auf den desktop verschieben,
-   diese startet GnuCash mit dem für die erweiterungen notwendigen
-   parametere "-extra".
+   Die Desktop-Verknüpfung "GnuCash Extra" auf den Desktop verschieben,
+   diese startet GnuCash mit dem für die Erweiterungen notwendigen
+   Parameter "-extra".
 -  
 
-   Falls alles funktioniert hat, sind die Gnucash Erweiterungen nach
+   Falls alles funktioniert hat, sind die Gnucash-Erweiterungen nach
    einem Neustart von Gnucash mit der Option "--extra" als neuer
    Menüpunkt "IngRieger" unterhalb des "Erweiterungen" Menüs sichtbar.
+
 
 Unter Linux/Unix:
 +++++++++++++++++++
@@ -98,22 +88,21 @@ Unter Linux/Unix:
    entpacken.
 -  
 
-   Die datei ibr-gnc-module.scm nach $HOME/.gnucash kopieren.
+   Die Datei ibr-gnc-module.scm nach $HOME/.gnucash kopieren.
 -  
 
    Die Datei config-user.scm nach $HOME/.gnucash kopieren (oder deren Inhalt
-   entsprechend anpassen falls dort schon eigene modifikationen
+   entsprechend anpassen falls dort schon eigene Modifikationen
    enthalten sind).
 -  
 
-   Falls alles funktioniert hat, sind die Gnucash Erweiterungen nach
+   Falls alles funktioniert hat, sind die Gnucash-Erweiterungen nach
    einem Neustart von Gnucash mit der Option "--extra" als neuer
    Menüpunkt "IngRieger" unterhalb des "Erweiterungen" Menüs sichtbar.
 
 DescValues
 ===============
 
- 
 
 Zusatzinformationen für das IBR Modul werden im Kontenrahmen
 gespeichert. Dies geschieht durch Eintragen bestimmter
@@ -151,7 +140,7 @@ Teilbuchungen automatisch eingefügt.
 -  
 
    Der umzubuchende Anteil muss im Zielkonto mit einem "Tara" DescValue
-   definiert werden. Tara lässt sich als Konstanter wert angeben oder
+   definiert werden. Tara lässt sich als konstanter Wert angeben oder
    als Prozentwert. Da sich prozentuale Angaben auf den Brutto- odere
    auf den Netto-Wert beziehen können, gibt es zwei verschiedene Tara
    Schlüssel: "BTARA" (bezieht sich auf den Bruttowert einer Buchung)
@@ -182,36 +171,36 @@ Prüfung Jahresabschluss
    "NULLSALDO": Dieses Konto soll beim Jahresabschluss auf 0
    abgeschlossen worden sein.
 
-CSV Datenexport für Steuerberater/datev
+CSV Datenexport für Steuerberater/Datev
 ===========================================
 
  
 
 **Menüpunkt:** Erweiterungen -> IngRieger -> CSV Export
 
-Hiermit können die buchungsdaten im sogenannten CSV format ("comma
-separated values", ascii) in eine datei exportiert werden. Ich benutze
-diese funktion um meine buchhaltungsdaten zum steuerberater zu
+Hiermit können die Buchungsdaten im sogenannten CSV-Format ("comma
+separated values", ascii) in eine Datei exportiert werden. Ich benutze
+diese Funktion um meine Buchhaltungsdaten zum Steuerberater zu
 übertragen.
 
-Dies ist KEIN export im DATEV format (DTAUS, "DATEV Diskette").
+Dies ist KEIN export im DATEV-Format (DTAUS, "DATEV Diskette").
 
-Mein steuerberater kann dann diese datei in sein "DATEV
-Kanzlei-Rechnungswesen 3.X" programm importieren.
+Mein Steuerberater kann dann diese Datei in sein "DATEV
+Kanzlei-Rechnungswesen 3.X" Programm importieren.
 
 **Berichtsoptionen**
 
 Der Zeitraum der zu exportierenden Buchungen kann in den Optionen
 eingestellt werden.
 
-Die checkbox "Daten im CSV Format exportieren" in den berichtsoptionen
-muss aktiviert werden um die CSV datei anzulegen. Grund für diese etwas
-umständliche vorgehensweise ist die die eigenschaft von GnuCash, die
-berichte bei jedem start des programms neu auszuführen. Um zu
-verhindern, dass bei jedem start von GnuCash eine neue CSV exportdatei
-angelegt wird, gibts diese option die vom benutzer explizit aktiviert
-werden muss. Ist die checkbox beim laden des berichtes nicht aktiviert,
-so erscheint eine entsprechende warnung im bericht.
+Die checkbox "Daten im CSV Format exportieren" in den Berichtsoptionen
+muss aktiviert werden, um die CSV-Datei anzulegen. Grund für diese etwas
+umständliche Vorgehensweise ist die eigenschaft von GnuCash, die
+Berichte bei jedem Start des Programms neu auszuführen. Um zu
+verhindern, dass bei jedem Start von GnuCash eine neue CSV-Exportdatei
+angelegt wird, gibt es diese option, die vom Benutzer explizit aktiviert
+werden muss. Ist die Checkbox beim Laden des Berichts nicht aktiviert,
+so erscheint eine entsprechende Warnung im Bericht.
 
  
 
@@ -219,52 +208,52 @@ so erscheint eine entsprechende warnung im bericht.
 
  
 
-Als datev-kontonummer wird beim export die gnucash Kontonummer benutzt.
+Als Datev-Kontonummer wird beim Export die Gnucash-Kontonummer benutzt.
 
  
 
 **Kontennummern beim Export umbenennen**
 
-Mit hilfe des DescValues "ExportKNR=<kontonummer>" können kontennummern
-beim export umbenannt werden um so die buchungen dem kontenrahmen des
-steuerberaters anzupassen. Die buchungen tauchen dadurch in der
-exportieren datei in einem anderen konto auf. Dies ermöglicht es, mit
-einem leicht anderen kontenrahmen als der steuerberater zu arbeiten.
+Mit Hilfe des DescValues "ExportKNR=<kontonummer>" können Kontennummern
+beim Export umbenannt werden um so die Buchungen dem Kontenrahmen des
+Steuerberaters anzupassen. Die Buchungen tauchen dadurch in der
+exportieren Datei in einem anderen Konto auf. Dies ermöglicht es, mit
+einem leicht anderen Kontenrahmen als der Steuerberater zu arbeiten.
 
-Betrachten wir z.b. das konto "Privat Entnahmen 2100": Ich benutze in
-meinem kontenrahmen neben dem konto 2100 für allgemeine privatentnahmen
-ein weiteres konto "Privat Entnahme Telefon" um die entsprechenden
-buchungen gesondert zu sammeln. Das konto "Privat Entnahme Telefon" hat
-die "inoffizielle" kontonummer 2100A bekommen. Nun kennt der
-kontenrahmen beim steuerberater ja nicht mein "spezialkonto 2100A" was
-beim import zu problemen führen würde. Desshalb wird das konto 2100A mit
-dem DescValue "ExportKNR=2100" markiert. Alle buchungen im konto 2100A
-werden somit beim export dem konto 2100 zugeschlagen. Der steuerberater
-sieht also nur das konto "Privat Entnahmen 2100" und die "spezialkonten"
-aus unserem eigenen kontenrahmen tauchen im konto 2100 auf. Das konto
-2100A ist also aus sicht des steuerberaters "versteckt".
+Betrachten wir z.b. das Konto "Privat Entnahmen 2100": Ich benutze in
+meinem Kontenrahmen neben dem Konto 2100 für allgemeine Privatentnahmen
+ein weiteres Konto "Privat Entnahme Telefon" um die entsprechenden
+Buchungen gesondert zu sammeln. Das Konto "Privat Entnahme Telefon" hat
+die "inoffizielle" Kontonummer 2100A bekommen. Nun kennt der
+Kontenrahmen beim Steuerberater ja nicht mein "spezialkonto 2100A" was
+beim Import zu Problemen führen würde. Deshalb wird das Konto 2100A mit
+dem DescValue "ExportKNR=2100" markiert. Alle Buchungen im Konto 2100A
+werden somit beim Export dem Konto 2100 zugeschlagen. Der Steuerberater
+sieht also nur das konto "Privat Entnahmen 2100" und die "Spezialkonten"
+aus unserem eigenen Kontenrahmen tauchen im Konto 2100 auf. Das Konto
+2100A ist also aus Sicht des Steuerberaters "versteckt".
 
  
 
 \ **Ausgabeverzeichnis, Dateiname**
 
-Die ausgabedatei wird in das verzeichnis "$HOME/gnc\_csv\_export"
-(hardcoded) geschrieben. Der dabei verwendete dateiname wird aus der
-jahreszahl des zu exportierenden geschäftsjahrs und einem zeitstempel
+Die Ausgabedatei wird in das Verzeichnis "$HOME/gnc\_csv\_export"
+(hardcoded) geschrieben. Der dabei verwendete Dateiname wird aus der
+Jahreszahl des zu exportierenden Geschäftsjahrs und einem Zeitstempel
 gebildet, z.B.:
 
 ::
 
       2007_03.03.2007.csv
 
-Eine bereits vorhandene datei wird ohne nachfrage überschrieben!
+Eine bereits vorhandene Datei wird ohne Nachfrage überschrieben!
 
 **Beispiel**
 
-Die testdatei "IBRTest.gnc" aus dem installations-paket öffnen und den
-menüpunkt "CSV Export" ausführen.
+Die Testdatei "IBRTest.gnc" aus dem Installations-Paket öffnen und den
+Menüpunkt "CSV Export" ausführen.
 
-Inhalt der exportieren datei  2007\_06.03.2007.csv:
+Inhalt der exportieren Datei  2007\_06.03.2007.csv:
 
 ::
 
@@ -352,7 +341,7 @@ Die Versions-Historie finden Sie am Anfang der Datei
 
  
 
-Download (alt, aktuelle quellen auf github)
+Download (alt, aktuelle Quellen auf github)
 =============================================
 
  
