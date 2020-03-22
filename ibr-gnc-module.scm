@@ -12,6 +12,9 @@
 
 ;
 ; $Log: ibr-gnc-module.scm,v $
+; Revision 1.61  2020-03-22  bh
+; * Kompatibilit‰t mit GnuCash 3.8
+;
 ; Revision 1.60  2016-04-04 09:26:15  bh
 ; * Kontennummern k√∂nnen nun 4 bis 6 zeichen lang sein.
 ; * Warnungen werden im bericht nun in blauer farbe (statt rot) ausgegeben.
