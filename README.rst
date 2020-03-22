@@ -9,12 +9,12 @@ IBR Gnucash Erweiterungen
 .. contents:: Inhalt
  
 
-Beachte
-===============
+Kompatibilität und Weiterentwicklung
+====================================
 
-Dieses modul wird nicht weiter von mir gepflegt, letzte getestete Gnucash version war 2.4.x.
+Dieses Modul wurde mit GnuCash v3.8 erfolgreich getestet.
 
-Neuentwicklung des moduls mit Python: `PyGnc <http://www.ibrieger.de/pygnc-buchhaltung-mit-gnucash-aqbanking-and-python.html>`_.
+Alternativ gibt es eine `Neuentwicklung dieses Moduls in Python (PyGnc) <http://www.ibrieger.de/pygnc-buchhaltung-mit-gnucash-aqbanking-and-python.html>`_.
 
 Github Mirror, Projekt Homepage
 ===============================
