@@ -3,6 +3,7 @@
 ; as they appear in http://www.gnu.org/licenses/gpl.txt.
 ;
 ; Copyright 2007-2015 erwin.rieger@ibrieger.de
+; Copyright 2020      devel@sumpfralle.de
 ;
 
 ; Enable stack backtraces
