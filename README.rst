@@ -12,14 +12,18 @@ IBR Gnucash Erweiterungen
 Beachte
 ===============
 
-Dieses modul wird nicht weiter von mir gepflegt, letzte getestete Gnucash version war 2.4.x.
+Diese seite beschreibt den entwicklungs-zweig (*branch*) *gnc-module-for-gnucash-2.4.x* des IBR GNC moduls, diese version wird nicht weiter von mir
+gepflegt. Die letzte getestete/unterstützte Gnucash version war 2.4.x.
 
-Neuentwicklung des moduls mit Python: `PyGnc <http://www.ibrieger.de/pygnc-buchhaltung-mit-gnucash-aqbanking-and-python.html>`_.
+Allerdings gibt es eine *weiterentwicklung* von *Lars Kruse* (<devel-at-sumpfralle.de>). Er hat das modul auf GnuCash 3.8.x portiert (stand märz 2020).
+Sie finden seine version im `master branch <https://github.com/ErwinRieger/ibr-gnc-module>`_.
+
+Daneben gibt es eine neuentwicklung des moduls mit Python hier: `PyGnc <http://www.ibrieger.de/pygnc-buchhaltung-mit-gnucash-aqbanking-and-python.html>`_.
 
 Github Mirror, Projekt Homepage
 ===============================
 
-Die aktuellen Quellen gibt es hier: `https://github.com/ErwinRieger/ibr-gnc-module <https://github.com/ErwinRieger/ibr-gnc-module>`_.
+Die aktuellen Quellen gibt es hier: `https://github.com/ErwinRieger/ibr-gnc-module/tree/gnc-module-for-gnucash-2.4.x <https://github.com/ErwinRieger/ibr-gnc-module/tree/gnc-module-for-gnucash-2.4.x>`_.
 
 Projekt homepage: `http://www.ibrieger.de/gnucash-erweiterungen.html <http://www.ibrieger.de/gnucash-erweiterungen.html>`_.
 
