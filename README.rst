@@ -23,9 +23,9 @@ Daneben gibt es eine neuentwicklung des moduls mit Python hier: `PyGnc <http://w
 Github Mirror, Projekt Homepage
 ===============================
 
-Die aktuellen Quellen gibt es hier: `https://github.com/ErwinRieger/ibr-gnc-module/tree/gnc-module-for-gnucash-2.4.x <https://github.com/ErwinRieger/ibr-gnc-module/tree/gnc-module-for-gnucash-2.4.x>`_.
+Die aktuellen Quellen gibt es hier: `github.com/ErwinRieger/ibr-gnc-module/tree/gnc-module-for-gnucash-2.4.x <https://github.com/ErwinRieger/ibr-gnc-module/tree/gnc-module-for-gnucash-2.4.x>`_.
 
-Projekt homepage: `http://www.ibrieger.de/gnucash-erweiterungen.html <http://www.ibrieger.de/gnucash-erweiterungen.html>`_.
+Projekt homepage: `www.ibrieger.de/gnucash-erweiterungen.html <http://www.ibrieger.de/gnucash-erweiterungen.html>`_.
 
 Einleitung
 =============
