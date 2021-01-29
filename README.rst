@@ -3,8 +3,6 @@ IBR Gnucash Erweiterungen
 ##########################
 
 :tags: GnuCash
-:slug: gnucash-erweiterungen
-
 
 .. contents:: Inhalt
  
