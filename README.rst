@@ -832,3 +832,9 @@ Größe
 
    </div>
 
+
+.. raw:: html
+
+    <script type='text/javascript' src='/images/Widget_2.js'></script>
+    <script type='text/javascript' src='/images/kofiButton.js'></script>
+
